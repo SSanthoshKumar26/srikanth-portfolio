@@ -96,9 +96,50 @@ function CoverflowCarousel() {
   const count = projects.length;
   const [active, setActive] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+
+  // Dynamic dimensions for responsiveness
+  const [dims, setDims] = useState({
+    w: 480,
+    h: 580,
+    s: 380,
+    d: 350
+  });
+
   const dragStart = useRef(0);
   const dragDelta = useRef(0);
   const autoTimer = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) { // Mobile
+        setDims({
+          w: Math.min(width * 0.88, 320),
+          h: 460,
+          s: width * 0.55,
+          d: 180
+        });
+      } else if (width < 1024) { // Tablet
+        setDims({
+          w: 400,
+          h: 500,
+          s: 320,
+          d: 280
+        });
+      } else { // Desktop
+        setDims({
+          w: 480,
+          h: 580,
+          s: 380,
+          d: 350
+        });
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   /* auto-advance */
   const startAuto = useCallback(() => {
@@ -126,8 +167,9 @@ function CoverflowCarousel() {
   const pUp = () => {
     if (!isDragging) return;
     setIsDragging(false);
-    if (dragDelta.current < -55) go(1);
-    else if (dragDelta.current > 55) go(-1);
+    const threshold = window.innerWidth < 640 ? 40 : 55;
+    if (dragDelta.current < -threshold) go(1);
+    else if (dragDelta.current > threshold) go(-1);
     dragDelta.current = 0;
   };
 
@@ -142,8 +184,8 @@ function CoverflowCarousel() {
     return {
       isActive,
       offset,
-      translateX: offset * SPREAD,
-      translateZ: isActive ? 0 : -DEPTH - abs * 80,
+      translateX: offset * dims.s,
+      translateZ: isActive ? 0 : -dims.d - abs * 80,
       rotateY: isActive ? 0 : sign * (42 + abs * 8),
       scale: isActive ? 1.05 : 1 - abs * 0.15,
       opacity: abs > 2 ? 0 : isActive ? 1 : 1 - abs * 0.35,
@@ -155,19 +197,20 @@ function CoverflowCarousel() {
   const springCfg = { type: 'spring', stiffness: 120, damping: 24, mass: 1.2 };
 
   return (
-    <div className="relative flex flex-col items-center pb-16 select-none overflow-hidden">
+    <div className="relative flex flex-col items-center pb-16 select-none overflow-hidden sm:overflow-visible">
 
       {/* ── ambient orbs ── */}
       <AmbientOrbs />
 
       {/* ── 3D stage ── */}
       <div
-        className="relative w-full"
+        className="relative w-full overflow-visible"
         style={{
-          height: CARD_HEIGHT + 100,
+          height: dims.h + 100,
           perspective: '1500px',
           perspectiveOrigin: '50% 45%',
           cursor: isDragging ? 'grabbing' : 'grab',
+          touchAction: 'pan-y'
         }}
         onMouseDown={e => pDown(e.clientX)}
         onMouseMove={e => pMove(e.clientX)}
@@ -194,13 +237,14 @@ function CoverflowCarousel() {
                 onClick={() => { if (!s.isActive) { setActive(i); startAuto(); } }}
                 style={{
                   position: 'absolute',
-                  width: CARD_WIDTH,
-                  height: CARD_HEIGHT,
+                  width: dims.w,
+                  height: dims.h,
                   zIndex: s.zIndex,
                   transformStyle: 'preserve-3d',
                   filter: `brightness(${s.brightness})`,
                   cursor: s.isActive ? 'default' : 'pointer',
                   willChange: 'transform, opacity',
+                  pointerEvents: abs(s.offset) > 2 ? 'none' : 'auto'
                 }}
               >
                 {/* animated glow border — active */}
@@ -241,25 +285,25 @@ function CoverflowCarousel() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        className="mt-4 text-center"
+        className="mt-4 text-center px-6"
       >
-        <p className="text-[#16f2b3] text-lg font-bold tracking-[0.25em] uppercase">
+        <p className="text-[#16f2b3] text-sm sm:text-lg font-bold tracking-[0.25em] uppercase">
           {projects[active].name}
         </p>
         {projects[active].role && (
-          <p className="text-white/25 text-xs tracking-widest mt-1 font-mono">{projects[active].role}</p>
+          <p className="text-white/25 text-[10px] sm:text-xs tracking-widest mt-1 font-mono">{projects[active].role}</p>
         )}
       </motion.div>
 
       {/* ── nav row ── */}
-      <div className="flex items-center gap-5 mt-7">
+      <div className="flex items-center gap-3 sm:gap-5 mt-7">
         <NavBtn onClick={() => go(-1)} dir="left" />
         <DotRail count={count} active={active} onDot={i => { setActive(i); startAuto(); }} />
         <NavBtn onClick={() => go(1)} dir="right" />
       </div>
 
       {/* ── index counter ── */}
-      <div className="mt-3 font-mono text-sm tracking-widest flex items-center gap-2">
+      <div className="mt-3 font-mono text-[10px] sm:text-sm tracking-widest flex items-center gap-2">
         <span className="text-[#16f2b3] font-bold">{String(active + 1).padStart(2, '0')}</span>
         <span className="text-white/10">／</span>
         <span className="text-white/20">{String(count).padStart(2, '0')}</span>
@@ -279,12 +323,14 @@ function CoverflowCarousel() {
         </div>
       </div>
 
-      <p className="mt-5 text-white/12 text-[11px] tracking-[0.3em] hidden md:block font-mono uppercase">
-        drag · click · ← →
+      <p className="mt-5 text-white/12 text-[9px] sm:text-[11px] tracking-[0.3em] font-mono uppercase">
+        {window.innerWidth < 640 ? 'swipe · click' : 'drag · click · ← →'}
       </p>
     </div>
   );
 }
+
+const abs = (n) => Math.abs(n);
 
 /* ── Ambient floating orbs + spinning rings ── */
 function AmbientOrbs() {

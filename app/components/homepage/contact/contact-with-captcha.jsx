@@ -1,5 +1,4 @@
 "use client";
-// @flow strict
 import { isValidEmail } from '@/utils/check-email';
 import emailjs from '@emailjs/browser';
 import axios from 'axios';
@@ -7,6 +6,7 @@ import { useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { TbMailForward } from "react-icons/tb";
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 
 function ContactWithCaptcha() {
   const [input, setInput] = useState({
@@ -27,30 +27,31 @@ function ContactWithCaptcha() {
   };
 
   const handleSendMail = async (e) => {
-    if (!captcha) {
-      toast.error('Please complete the captcha!');
-      return;
-    } else {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_APP_URL}/api/google`, {
-        token: captcha
-      });
-
-      setCaptcha(null);
-      if (!res.data.success) {
-        toast.error('Captcha verification failed!');
-        return;
-      };
-    };
-
     e.preventDefault();
+
+    if (!captcha) {
+      toast.error('Please complete the captcha verification');
+      return;
+    }
+
     if (!input.email || !input.message || !input.name) {
       setError({ ...error, required: true });
       return;
     } else if (error.email) {
       return;
-    } else {
-      setError({ ...error, required: false });
-    };
+    }
+
+    const verificationRes = await axios.post(`${process.env.NEXT_PUBLIC_APP_URL}/api/google`, {
+      token: captcha
+    });
+
+    if (!verificationRes.data.success) {
+      toast.error('Captcha verification failed!');
+      return;
+    }
+
+    setCaptcha(null);
+    setError({ ...error, required: false });
 
     const serviceID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
     const templateID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
@@ -60,7 +61,7 @@ function ContactWithCaptcha() {
       const res = await emailjs.send(serviceID, templateID, input, options);
 
       if (res.status === 200) {
-        toast.success('Message sent successfully!');
+        toast.success('Professional inquiry received safely!');
         setInput({
           name: '',
           email: '',
@@ -73,78 +74,71 @@ function ContactWithCaptcha() {
   };
 
   return (
-    <div className="">
-      <p className="font-medium mb-5 text-[#16f2b3] text-xl uppercase">
-        Contact with me
-      </p>
-      <div className="max-w-3xl text-white rounded-lg border border-[#464c6a] p-3 lg:p-5">
-        <p className="text-sm text-[#d3d8e8]">
-          {"If you have any questions or concerns, please don't hesitate to contact me. I am open to any work opportunities that align with my skills and interests."}
-        </p>
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label className="text-base">Your Name: </label>
+    <div className="relative w-full group">
+      <div className="absolute -inset-2 bg-gradient-to-r from-[#16f2b3]/20 to-violet-500/20 rounded-[2rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+      <div className="relative bg-[#0d1224]/80 backdrop-blur-xl border border-white/10 p-8 lg:p-12 rounded-[2.5rem] shadow-2xl">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-3">
+            <label className="text-xs font-bold uppercase tracking-[0.3em] text-[#16f2b3]">Full Name</label>
             <input
-              className="bg-[#10172d] w-full border rounded-md border-[#353a52] focus:border-[#16f2b3] ring-0 outline-0 transition-all duration-300 px-3 py-2"
+              className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white focus:outline-none focus:border-[#16f2b3] focus:bg-white/10 transition-all duration-300"
               type="text"
-              maxLength="100"
-              required={true}
               onChange={(e) => setInput({ ...input, name: e.target.value })}
               onBlur={checkRequired}
               value={input.name}
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-base">Your Email: </label>
+          <div className="flex flex-col gap-3">
+            <label className={`text-xs font-bold uppercase tracking-[0.3em] ${error.email ? 'text-red-500' : 'text-[#16f2b3]'}`}>Email Address</label>
             <input
-              className="bg-[#10172d] w-full border rounded-md border-[#353a52] focus:border-[#16f2b3] ring-0 outline-0 transition-all duration-300 px-3 py-2"
+              className={`bg-white/5 border rounded-2xl px-5 py-5 text-white focus:outline-none focus:bg-white/10 transition-all duration-300 ${error.email ? 'border-red-500' : 'border-white/10 focus:border-[#16f2b3]'}`}
               type="email"
-              maxLength="100"
-              required={true}
-              value={input.email}
               onChange={(e) => setInput({ ...input, email: e.target.value })}
               onBlur={() => {
                 checkRequired();
                 setError({ ...error, email: !isValidEmail(input.email) });
               }}
+              value={input.email}
             />
-            {error.email &&
-              <p className="text-sm text-red-400">Please provide a valid email!</p>
-            }
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-base">Your Message: </label>
+          <div className="flex flex-col gap-3">
+            <label className="text-xs font-bold uppercase tracking-[0.3em] text-[#16f2b3]">Your Message</label>
             <textarea
-              className="bg-[#10172d] w-full border rounded-md border-[#353a52] focus:border-[#16f2b3] ring-0 outline-0 transition-all duration-300 px-3 py-2"
-              maxLength="500"
-              name="message"
-              required={true}
+              className="bg-white/5 border border-white/10 rounded-2xl px-5 py-5 text-white focus:outline-none focus:border-[#16f2b3] focus:bg-white/10 transition-all duration-300 resize-none"
+              rows="4"
               onChange={(e) => setInput({ ...input, message: e.target.value })}
               onBlur={checkRequired}
-              rows="4"
               value={input.message}
             />
           </div>
-          <ReCAPTCHA
-            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-            onChange={(code) => setCaptcha(code)}
-          />
-          <div className="flex flex-col items-center gap-2">
-            {error.required &&
-              <p className="text-sm text-red-400">
-                Email and Message are required!
-              </p>
-            }
-            <button
-              className="flex items-center gap-1 hover:gap-3 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 px-5 md:px-12 py-2.5 md:py-3 text-center text-xs md:text-sm font-medium uppercase tracking-wider text-white no-underline transition-all duration-200 ease-out hover:text-white hover:no-underline md:font-semibold"
-              role="button"
-              onClick={handleSendMail}
-            >
-              <span>Send Message</span>
-              <TbMailForward className="mt-1" size={18} />
-            </button>
+
+          <div className="flex flex-col gap-6">
+            <div className="flex justify-center lg:justify-start">
+              <ReCAPTCHA
+                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                onChange={(code) => setCaptcha(code)}
+                theme="dark"
+              />
+            </div>
+
+            <div className="mt-2">
+              {error.required && (
+                <p className="text-xs text-red-500 mb-6 font-bold tracking-widest uppercase animate-pulse text-center lg:text-left">
+                  Please complete all required fields
+                </p>
+              )}
+              <motion.button
+                whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(22, 242, 179, 0.2)" }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSendMail}
+                className="w-full group flex items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-[#16f2b3] to-violet-600 px-8 py-5 text-center text-xs font-black uppercase tracking-[0.4em] text-[#0d1224] shadow-xl transition-all duration-300"
+              >
+                <span>Send Message</span>
+                <TbMailForward className="group-hover:translate-x-2 transition-transform" size={20} />
+              </motion.button>
+            </div>
           </div>
         </div>
       </div>

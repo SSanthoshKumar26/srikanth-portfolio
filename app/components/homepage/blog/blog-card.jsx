@@ -1,30 +1,38 @@
-// @flow strict
+"use client";
 import Image from 'next/image';
 import Link from 'next/link';
 
-
 function BlogCard({ blog }) {
-
   return (
-    <div className="border border-[#1d293a] hover:border-[#464c6a] transition-all duration-500 bg-[#1b203e] rounded-lg relative group">
-      <div className="h-44 lg:h-52 w-auto cursor-pointer overflow-hidden rounded-t-lg">
+    <div className="border border-white/10 transition-all duration-500 bg-white/5 backdrop-blur-md rounded-2xl relative group hover:border-[#16f2b3]/30 hover:bg-white/10">
+      <div className="h-44 lg:h-52 w-auto cursor-pointer overflow-hidden rounded-t-2xl">
         <Image
-          src= {blog.cover_image} // Adjust path based on your project structure
+          src={blog.cover_image}
           height={1080}
           width={1920}
-          className='h-full w-full group-hover:scale-110 transition-all duration-300'
+          alt={blog.title}
+          className="h-full w-full object-cover group-hover:scale-110 transition-all duration-700 opacity-80 group-hover:opacity-100"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
-      <div className="p-2 sm:p-3 flex flex-col">
+      <div className="p-5 sm:p-6 flex flex-col gap-3">
         <Link target='_blank' href={blog.url}>
-          <p className='my-2 lg:my-3 cursor-pointer text-lg text-white sm:text-xl font-medium hover:text-violet-500'>
+          <p className='cursor-pointer text-xl text-white font-bold hover:text-[#16f2b3] transition-colors line-clamp-1'>
             {blog?.title}
           </p>
         </Link>
-        <p className='text-sm lg:text-base text-[#d3d8e8] pb-3 lg:pb-6 line-clamp-3'>
+        <p className='text-sm text-gray-400 line-clamp-3 leading-relaxed'>
           {blog?.summary}
         </p>
-        {/* Example of rendering buttons or additional links */}
+        <div className="mt-2">
+          <Link
+            target='_blank'
+            href={blog.url}
+            className="text-xs font-bold uppercase tracking-[0.2em] text-[#16f2b3] hover:text-white transition-colors"
+          >
+            View Certificate →
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ export const personalData = {
   name: "SRIKANTH SRIDHAR",
   profile: '/profile.png',
   designation: "Full Stack Developer",
-  description: "My Name is SRIKANTH SRIDHAR. I am a dedicated and adaptable individual with strong leadership experience as a School Pupil Leader and as the Student Representative of the Complaint cum Redressal Committee in my college. I thrive under challenges and remain committed to delivering results with precision. Known for taking ownership of tasks with enthusiasm, valuing teamwork, and continuously seeking growth through learning.",
+  description: "My Name is SRIKANTH SRIDHAR. I am a dedicated and adaptable individual with strong leadership experience as a School Pupil Leader and as the Student Representative of the Complaint cum Redressal Committee in my college.\nI thrive under challenges and remain committed to delivering results with precision. Known for taking ownership of tasks with enthusiasm, valuing teamwork, and continuously seeking growth through learning.",
   email: 'srisrikanthtvs@gmail.com',
   phone: '+91 9342869610',
   address: '1A Srinath Bhavan Sathya Sai Nagar TVS Nagar Madurai',

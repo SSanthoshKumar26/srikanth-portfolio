@@ -1,12 +1,12 @@
 "use client";
-// @flow strict
 import { isValidEmail } from '@/utils/check-email';
 import emailjs from '@emailjs/browser';
 import { useState } from 'react';
 import { TbMailForward } from "react-icons/tb";
 import { toast } from 'react-toastify';
+import { motion } from 'framer-motion';
 
-function ContactWithoutCaptcha() {
+const ContactWithoutCaptcha = () => {
   const [input, setInput] = useState({
     name: '',
     email: '',
@@ -16,12 +16,6 @@ function ContactWithoutCaptcha() {
     email: false,
     required: false,
   });
-
-  const checkRequired = () => {
-    if (input.email && input.message && input.name) {
-      setError({ ...error, required: false });
-    }
-  };
 
   const handleSendMail = async (e) => {
     e.preventDefault();
@@ -40,14 +34,9 @@ function ContactWithoutCaptcha() {
 
     try {
       const res = await emailjs.send(serviceID, templateID, input, options);
-
       if (res.status === 200) {
-        toast.success('Message sent successfully!');
-        setInput({
-          name: '',
-          email: '',
-          message: '',
-        });
+        toast.success('Professional inquiry received safely!');
+        setInput({ name: '', email: '', message: '' });
       };
     } catch (error) {
       toast.error(error?.text || error);
@@ -55,78 +44,132 @@ function ContactWithoutCaptcha() {
   };
 
   return (
-    <div className="">
-      <p className="font-medium mb-5 text-[#16f2b3] text-xl uppercase">
-        Contact with me
-      </p>
-      <div className="max-w-3xl text-white rounded-lg border border-[#464c6a] p-3 lg:p-5">
-        <p className="text-sm text-[#d3d8e8]">
-          {"If you have any questions or concerns, please don't hesitate to contact me. I am open to any work opportunities that align with my skills and interests."}
-        </p>
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <label className="text-base">Your Name: </label>
-            <input
-              className="bg-[#10172d] w-full border rounded-md border-[#353a52] focus:border-[#16f2b3] ring-0 outline-0 transition-all duration-300 px-3 py-2"
-              type="text"
-              maxLength="100"
-              required={true}
-              onChange={(e) => setInput({ ...input, name: e.target.value })}
-              onBlur={checkRequired}
-              value={input.name}
-            />
-          </div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+      className="relative w-full group"
+    >
+      <div className="absolute -inset-1 bg-gradient-to-r from-[#16f2b3]/20 to-violet-500/20 rounded-[2.5rem] blur-2xl opacity-20 group-hover:opacity-50 transition duration-1000"></div>
 
-          <div className="flex flex-col gap-2">
-            <label className="text-base">Your Email: </label>
-            <input
-              className="bg-[#10172d] w-full border rounded-md border-[#353a52] focus:border-[#16f2b3] ring-0 outline-0 transition-all duration-300 px-3 py-2"
-              type="email"
-              maxLength="100"
-              required={true}
-              value={input.email}
-              onChange={(e) => setInput({ ...input, email: e.target.value })}
-              onBlur={() => {
-                checkRequired();
-                setError({ ...error, email: !isValidEmail(input.email) });
-              }}
-            />
-            {error.email &&
-              <p className="text-sm text-red-400">Please provide a valid email!</p>
-            }
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label className="text-base">Your Message: </label>
-            <textarea
-              className="bg-[#10172d] w-full border rounded-md border-[#353a52] focus:border-[#16f2b3] ring-0 outline-0 transition-all duration-300 px-3 py-2"
-              maxLength="500"
-              name="message"
-              required={true}
-              onChange={(e) => setInput({ ...input, message: e.target.value })}
-              onBlur={checkRequired}
-              rows="4"
-              value={input.message}
-            />
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            {error.required &&
-              <p className="text-sm text-red-400">
-                Email and Message are required!
-              </p>
-            }
-            <button
-              className="flex items-center gap-1 hover:gap-3 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 px-5 md:px-12 py-2.5 md:py-3 text-center text-xs md:text-sm font-medium uppercase tracking-wider text-white no-underline transition-all duration-200 ease-out hover:text-white hover:no-underline md:font-semibold"
-              role="button"
-              onClick={handleSendMail}
+      <div className="relative bg-[#0d1224]/80 backdrop-blur-2xl border border-white/10 p-6 lg:p-10 rounded-[2.5rem] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8)]">
+        <div className="flex flex-col gap-8">
+          {/* Header Area */}
+          <div className="flex flex-col gap-3">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
             >
-              <span>Send Message</span>
-              <TbMailForward className="mt-1" size={18} />
-            </button>
+              <h3 className="text-2xl lg:text-3xl font-black text-white tracking-tight">
+                Let&apos;s <span className="text-[#16f2b3]">Connect</span>
+              </h3>
+              <div className="w-16 h-1 mt-2 bg-gradient-to-r from-[#16f2b3] to-transparent rounded-full"></div>
+            </motion.div>
+            <p className="text-gray-400 text-sm font-medium">Have a project in mind? Reach out and let&apos;s build something extraordinary.</p>
+          </div>
+
+          {/* Form Fields with Staggered Animation */}
+          <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-col gap-2 group/input"
+              >
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#16f2b3]/80 group-focus-within/input:text-[#16f2b3] transition-colors">Full Name</label>
+                <div className="relative">
+                  <input
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#16f2b3] focus:bg-white/10 transition-all duration-300 shadow-inner group-hover/input:border-white/20"
+                    type="text"
+                    onChange={(e) => {
+                      setInput({ ...input, name: e.target.value });
+                      if (error.required) setError({ ...error, required: false });
+                    }}
+                    value={input.name}
+                    placeholder="Srikanth Sridhar"
+                  />
+                  <div className="absolute inset-0 rounded-2xl bg-[#16f2b3]/5 opacity-0 focus-within:opacity-100 pointer-events-none transition-opacity"></div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="flex flex-col gap-2 group/input"
+              >
+                <label className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${error.email ? 'text-red-500' : 'text-[#16f2b3]/80 group-focus-within/input:text-[#16f2b3]'}`}>Email Address</label>
+                <div className="relative">
+                  <input
+                    className={`w-full bg-white/5 border rounded-2xl px-5 py-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:bg-white/10 transition-all duration-300 shadow-inner group-hover/input:border-white/20 ${error.email ? 'border-red-500' : 'border-white/10 focus:border-[#16f2b3]'}`}
+                    type="email"
+                    onChange={(e) => {
+                      setInput({ ...input, email: e.target.value });
+                      if (error.email) setError({ ...error, email: false });
+                      if (error.required) setError({ ...error, required: false });
+                    }}
+                    onBlur={() => {
+                      if (input.email.length > 0) {
+                        setError({ ...error, email: !isValidEmail(input.email) });
+                      }
+                    }}
+                    value={input.email}
+                    placeholder="srikanth@example.com"
+                  />
+                </div>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-col gap-2 group/input"
+            >
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#16f2b3]/80 group-focus-within/input:text-[#16f2b3] transition-colors">Your Message</label>
+              <textarea
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#16f2b3] focus:bg-white/10 transition-all duration-300 resize-none min-h-[150px] shadow-inner group-hover/input:border-white/20"
+                onChange={(e) => {
+                  setInput({ ...input, message: e.target.value });
+                  if (error.required) setError({ ...error, required: false });
+                }}
+                value={input.message}
+                placeholder="Tell me about your amazing project..."
+              />
+            </motion.div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {error.required && (
+              <motion.p
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-[10px] text-red-400 font-bold tracking-widest uppercase text-center"
+              >
+                All fields are required to transmit
+              </motion.p>
+            )}
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSendMail}
+              className="w-full group flex items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-[#16f2b3] via-violet-600 to-[#16f2b3] bg-[length:200%_auto] hover:bg-right px-8 py-5 text-center text-[12px] font-black uppercase tracking-[0.4em] text-[#0d1224] shadow-[0_20px_50px_-15px_rgba(22,242,179,0.5)] transition-all duration-700 hover:shadow-cyan-500/20"
+            >
+              <span>Transmit Message</span>
+              <TbMailForward size={20} className="group-hover:translate-x-3 group-hover:-translate-y-1 transition-transform duration-700 ease-out" />
+            </motion.button>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

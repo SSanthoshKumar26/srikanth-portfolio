@@ -1,9 +1,10 @@
 .glow-container {
-  --spread: 60;
+  --spread: 100;
+  --blur: 12;
 }
 
 .glow-card {
-  --active: 0.15;
+  --active: 0;
   --start: 0;
 }
 
@@ -20,19 +21,17 @@
 
 .glows::after,
 .glows::before {
-  --alpha: 0;
   content: "";
   background: conic-gradient(from 180deg at 50% 70%,
-      #f626af 0deg,
-      #8228ec 72.0000010728836deg,
-      #f626af 144.0000021457672deg,
-      #0025ba 216.00000858306885deg,
-      #f626af 288.0000042915344deg,
+      #16f2b3 0deg,
+      #8228ec 72deg,
+      #16f2b3 144deg,
+      #0025ba 216deg,
+      #16f2b3 288deg,
       #fafafa 1turn);
   background-attachment: fixed;
   position: absolute;
-  inset: -5px;
-  border: 8px solid transparent;
+  inset: -2px;
   border-radius: 12px;
   mask: linear-gradient(#0000, #0000),
     conic-gradient(from calc((var(--start) - (var(--spread) * 0.5)) * 1deg),
@@ -42,55 +41,31 @@
   mask-composite: intersect;
   mask-clip: padding-box, border-box;
   opacity: var(--active);
-  transition: opacity 1s;
-}
-
-.glow-card::before {
-  position: absolute;
-  inset: 0;
-  border: 2px solid transparent;
-  content: "";
-  border-radius: 12px;
-  pointer-events: none;
-  background: #84738c;
-  background-attachment: fixed;
-  border-radius: 12px;
-  mask: linear-gradient(#0000, #0000),
-    conic-gradient(from calc(((var(--start) + (var(--spread) * 0.25)) - (var(--spread) * 1.5)) * 1deg),
-      #ffffff26 0deg,
-      white,
-      #ffffff26 calc(var(--spread) * 2.5deg));
-  mask-clip: padding-box, border-box;
-  mask-composite: intersect;
-  opacity: var(--active);
-  transition: opacity 1s;
+  transition: opacity 0.3s ease;
 }
 
 .glow-card::after {
-  --bg-size: 100%;
   content: "";
   pointer-events: none;
   position: absolute;
+  inset: 0;
   background: conic-gradient(from 180deg at 50% 70%,
-      #f626af 0deg,
-      #8228ec 72.0000010728836deg,
-      #f626af 144.0000021457672deg,
-      #0025ba 216.00000858306885deg,
-      #f626af 288.0000042915344deg,
+      #16f2b3 0deg,
+      #8228ec 72deg,
+      #16f2b3 144deg,
+      #0025ba 216deg,
+      #16f2b3 288deg,
       #fafafa 1turn);
   background-attachment: fixed;
   border-radius: 12px;
-  opacity: var(--active, 0);
-  transition: opacity 1s;
-  --alpha: 0;
-  inset: 0;
-  border: 2px solid transparent;
+  opacity: var(--active);
+  transition: opacity 0.3s ease;
   mask: linear-gradient(#0000, #0000),
-    conic-gradient(from calc(((var(--start) + (var(--spread) * 0.25)) - (var(--spread) * 0.5)) * 1deg),
+    conic-gradient(from calc((var(--start) - (var(--spread) * 0.2)) * 1deg),
       #0000 0deg,
       #fff,
-      #0000 calc(var(--spread) * 0.5deg));
-  filter: brightness(1.5);
+      #0000 calc(var(--spread) * 0.4deg));
+  filter: brightness(1.8) saturate(1.5);
   mask-clip: padding-box, border-box;
   mask-composite: intersect;
 }

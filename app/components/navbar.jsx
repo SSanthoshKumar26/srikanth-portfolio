@@ -26,6 +26,14 @@ function Navbar() {
   return (
     <nav className="sticky top-0 z-[100] bg-[#0d1224]/70 backdrop-blur-xl border-b border-white/5">
       <div className="flex items-center justify-between py-4 container mx-auto px-6 lg:px-12">
+        {/* MOBILE MENU TOGGLE */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="md:hidden text-[#16f2b3] p-2 hover:bg-white/5 rounded-lg transition-colors focus:outline-none z-50"
+        >
+          {isOpen ? <HiX size={28} /> : <HiMenuAlt3 size={28} />}
+        </button>
+
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -58,14 +66,6 @@ function Navbar() {
             </li>
           ))}
         </motion.ul>
-
-        {/* MOBILE MENU TOGGLE */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-[#16f2b3] p-2 hover:bg-white/5 rounded-lg transition-colors focus:outline-none"
-        >
-          {isOpen ? <HiX size={28} /> : <HiMenuAlt3 size={28} />}
-        </button>
       </div>
 
       {/* MOBILE MENU DROPDOWN */}

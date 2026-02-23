@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FaTools, FaUser, FaRocket, FaGithub } from 'react-icons/fa';
+import { FaTools, FaUser, FaRocket, FaGithub, FaInfoCircle, FaExternalLinkAlt } from 'react-icons/fa';
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 function ProjectCard({ project, isStatic = false }) {
@@ -84,16 +84,30 @@ function ProjectCard({ project, isStatic = false }) {
             </div>
           </div>
 
-          <div className="flex-shrink-0">
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
+            {/* Mobile-only Info Indicator */}
+            {!isStatic && (
+              <div
+                className="md:hidden flex items-center justify-center w-7 h-7 rounded-full bg-[#16f2b3]/10 text-[#16f2b3] border border-[#16f2b3]/20 shadow-[0_0_10px_rgba(22,242,179,0.1)] transition-all active:scale-90"
+              >
+                <FaInfoCircle className="text-xs" />
+              </div>
+            )}
+
             {(project.code || project.repoUrl) && (
               <a
                 href={project.code || project.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                title={(project.code || project.repoUrl).includes("github.com") ? "View Code" : "Live Demo"}
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center justify-center w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/5 text-white hover:bg-cyan-300 hover:text-black transition-all transform hover:scale-110 active:scale-95 border border-white/5"
               >
-                <FaGithub className="text-sm md:text-lg" />
+                {(project.code || project.repoUrl).includes("github.com") ? (
+                  <FaGithub className="text-sm md:text-lg" />
+                ) : (
+                  <FaExternalLinkAlt className="text-[10px] md:text-xs" />
+                )}
               </a>
             )}
           </div>

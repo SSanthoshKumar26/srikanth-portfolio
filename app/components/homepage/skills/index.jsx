@@ -19,7 +19,7 @@ function Skills() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 sm:px-12 lg:max-w-[70rem] xl:max-w-[76rem] 2xl:max-w-[92rem] flex justify-center mb-12 lg:mb-20 lg:py-12">
+      <div className="w-full flex justify-center mb-12 lg:mb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -27,11 +27,11 @@ function Skills() {
           transition={{ duration: 0.5 }}
           className="flex items-center"
         >
-          <span className="w-12 md:w-24 h-[2px] bg-gradient-to-r from-transparent to-[#1a1443]"></span>
-          <span className="bg-[#1a1443] w-fit text-white p-3 px-6 text-sm md:text-lg rounded-lg hover:text-[#16f2b3] transition-all duration-300 cursor-pointer uppercase tracking-widest font-bold border border-[#25213b]">
+          <span className="w-10 sm:w-24 h-[2px] bg-gradient-to-r from-transparent to-[#1a1443]"></span>
+          <span className="bg-[#1a1443] w-fit text-white p-3 px-6 text-xs sm:text-sm md:text-lg rounded-lg hover:text-[#16f2b3] transition-all duration-300 cursor-pointer uppercase tracking-widest font-bold border border-[#25213b] text-center">
             Skills & Tech Stack
           </span>
-          <span className="w-12 md:w-24 h-[2px] bg-gradient-to-l from-transparent to-[#1a1443]"></span>
+          <span className="w-10 sm:w-24 h-[2px] bg-gradient-to-l from-transparent to-[#1a1443]"></span>
         </motion.div>
       </div>
 

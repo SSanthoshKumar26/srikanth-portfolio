@@ -32,32 +32,43 @@ const SmoothScroll = ({ children }) => {
 
         const rafId = requestAnimationFrame(raf);
 
-        // Professional anchor click handling to prevent sudden jumps
-        const handleAnchorClick = (e) => {
-            const href = e.currentTarget.getAttribute('href');
+        // Global event delegation for all anchor clicks
+        const handleGlobalClick = (e) => {
+            const anchor = e.target.closest('a');
+            if (!anchor) return;
 
+            const href = anchor.getAttribute('href');
+
+            // Handle both '#' and '/#' (for homepage sections)
             if (href && (href.startsWith('#') || (href.startsWith('/#') && window.location.pathname === '/'))) {
-                e.preventDefault();
                 const targetId = href.startsWith('/#') ? href.substring(1) : href;
+
+                // If it's just '#', it's usually a dummy link or scroll to top
+                if (targetId === '#') {
+                    e.preventDefault();
+                    lenis.scrollTo(0, { duration: 1.2 });
+                    return;
+                }
+
                 const target = document.querySelector(targetId);
 
                 if (target) {
+                    e.preventDefault();
                     lenis.scrollTo(target, {
                         offset: -80,
-                        duration: 1.2,
-                        easing: (t) => 1 - Math.pow(1 - t, 4),
+                        duration: 1.5,
+                        easing: (t) => 1 - Math.pow(1 - t, 5), // Even smoother easing
                     });
                 }
             }
         };
 
-        const anchors = document.querySelectorAll('a[href*="#"]');
-        anchors.forEach(anchor => anchor.addEventListener('click', handleAnchorClick));
+        document.addEventListener('click', handleGlobalClick);
 
         return () => {
             lenis.destroy();
             cancelAnimationFrame(rafId);
-            anchors.forEach(anchor => anchor.removeEventListener('click', handleAnchorClick));
+            document.removeEventListener('click', handleGlobalClick);
         };
     }, []);
 

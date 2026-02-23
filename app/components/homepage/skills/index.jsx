@@ -29,7 +29,7 @@ function Skills() {
         >
           <span className="w-12 md:w-24 h-[2px] bg-gradient-to-r from-transparent to-[#1a1443]"></span>
           <h2 className="bg-[#1a1443] w-fit text-white p-3 px-6 text-sm md:text-xl rounded-lg hover:text-[#16f2b3] transition-all duration-300 cursor-pointer uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold border border-[#25213b] shadow-2xl">
-            Skills & Tech Stack
+            TECHNICAL SKILLS
           </h2>
           <span className="w-12 md:w-24 h-[2px] bg-gradient-to-l from-transparent to-[#1a1443]"></span>
         </motion.div>

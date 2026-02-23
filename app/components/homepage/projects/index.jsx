@@ -1,20 +1,31 @@
 // projects.tsx
 "use client";
 
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { HiArrowNarrowLeft, HiArrowNarrowRight } from 'react-icons/hi';
+import { IoCloseOutline } from 'react-icons/io5';
 import { projectsData } from '@/utils/data/projects-data';
 import ProjectCard from './project-card';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import Marquee from 'react-fast-marquee';
-import { IoCloseOutline } from 'react-icons/io5';
 
 const Projects = () => {
+  const [isPaused, setIsPaused] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Initialize scroll position for seamless loop
+  useEffect(() => {
+    if (mounted && scrollRef.current) {
+      const ele = scrollRef.current;
+      // Start in the middle third
+      ele.scrollLeft = ele.scrollWidth / 3;
+    }
+  }, [mounted]);
 
   // PREVENT BACKGROUND SCROLL WHEN MODAL IS OPEN
   useEffect(() => {
@@ -37,7 +48,6 @@ const Projects = () => {
     }
 
     return () => {
-      // Final fallback to ensure body isn't stuck fixed
       if (!selectedProject) {
         document.body.style.position = '';
         document.body.style.top = '';
@@ -46,6 +56,82 @@ const Projects = () => {
       }
     };
   }, [selectedProject]);
+
+  // AUTO SLIDE LOGIC - REWRITTEN FOR ULTRA SMOOTH 60FPS+
+  useEffect(() => {
+    if (isPaused || !mounted || selectedProject) return;
+
+    let rafId;
+    let lastTime = 0;
+
+    const scroll = (time) => {
+      if (!lastTime) lastTime = time;
+      const deltaTime = time - lastTime;
+
+      if (deltaTime > 16) {
+        if (scrollRef.current) {
+          const ele = scrollRef.current;
+          const oneThird = ele.scrollWidth / 3;
+
+          ele.scrollLeft -= 1;
+
+          // Loop seamlessly (Bidirectional support)
+          if (ele.scrollLeft <= 0) {
+            ele.scrollLeft = oneThird;
+          } else if (ele.scrollLeft >= oneThird * 2) {
+            ele.scrollLeft = oneThird;
+          }
+        }
+        lastTime = time;
+      }
+
+      rafId = requestAnimationFrame(scroll);
+    };
+
+    rafId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(rafId);
+  }, [isPaused, mounted, selectedProject]);
+
+  const handleScroll = (direction) => {
+    if (scrollRef.current) {
+      const ele = scrollRef.current;
+      const oneThird = ele.scrollWidth / 3;
+
+      setIsPaused(true);
+      ele.style.scrollBehavior = 'smooth';
+      const scrollAmount = window.innerWidth > 768 ? 500 : 300;
+
+      const currentScroll = ele.scrollLeft;
+      const targetScroll = currentScroll + (direction === 'next' ? scrollAmount : -scrollAmount);
+
+      // Pre-emptive jump if we are about to hit the physical edges of the tripled content
+      if (direction === 'prev' && targetScroll < 100) {
+        ele.style.scrollBehavior = 'auto';
+        ele.scrollLeft = oneThird + currentScroll;
+        ele.style.scrollBehavior = 'smooth';
+      } else if (direction === 'next' && targetScroll > (oneThird * 2) - 100) {
+        ele.style.scrollBehavior = 'auto';
+        ele.scrollLeft = currentScroll - oneThird;
+        ele.style.scrollBehavior = 'smooth';
+      }
+
+      ele.scrollBy({
+        left: direction === 'next' ? scrollAmount : -scrollAmount
+      });
+
+      setTimeout(() => {
+        if (ele) {
+          ele.style.scrollBehavior = 'auto';
+          const mid = ele.scrollWidth / 3;
+          // Softly center if we ended up near edges
+          if (ele.scrollLeft < 150 || ele.scrollLeft > (mid * 2) - 150) {
+            ele.scrollLeft = mid + (ele.scrollLeft % mid);
+          }
+        }
+        setIsPaused(false);
+      }, 700);
+    }
+  };
 
   if (!mounted) return null;
 
@@ -59,43 +145,96 @@ const Projects = () => {
         <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-violet-500 to-transparent mb-16" />
 
         {/* Heading */}
-        <div className="w-full flex justify-center mb-20 lg:mb-32">
+        <div className="w-full flex justify-center mb-12 lg:mb-20 px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             className="flex items-center"
           >
-            <span className="w-24 h-[1px] bg-gradient-to-r from-transparent to-violet-500" />
-
+            <span className="w-12 md:w-24 h-[1px] bg-gradient-to-r from-transparent to-violet-500" />
             <h2 className="bg-[#1a1443] text-white px-6 py-3 text-xl rounded-lg uppercase tracking-[0.3em] font-bold border border-[#25213b] shadow-2xl">
               Featured Projects
             </h2>
-
-            <span className="w-24 h-[1px] bg-gradient-to-l from-transparent to-violet-500" />
+            <span className="w-12 md:w-24 h-[1px] bg-gradient-to-l from-transparent to-violet-500" />
           </motion.div>
         </div>
 
-        {/* FULL WIDTH MARQUEE - BALANCED PADDING FOR GLOW VISIBILITY */}
-        <div className="w-full no-scrollbar pt-20 pb-32 md:pt-28 md:pb-48 overflow-visible relative">
-          <Marquee
-            gradient={false}
-            speed={35}
-            pauseOnHover={false}
-            direction="right"
-            className="no-scrollbar !overflow-visible"
+        {/* INTERACTIVE CAROUSEL CONTAINER */}
+        <div
+          className="w-full relative overflow-visible"
+        >
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto no-scrollbar gap-8 md:gap-12 px-8 md:px-20 lg:px-40 py-12 md:py-24"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              cursor: 'grab',
+              scrollBehavior: 'auto'
+            }}
+            onMouseDown={(e) => {
+              const ele = scrollRef.current;
+              ele.style.cursor = 'grabbing';
+              ele.style.userSelect = 'none';
+              ele.style.scrollBehavior = 'auto';
+              const startX = e.pageX - ele.offsetLeft;
+              const scrollLeft = ele.scrollLeft;
+
+              const onMouseMove = (e) => {
+                const x = e.pageX - ele.offsetLeft;
+                const walk = (x - startX) * 2;
+                ele.scrollLeft = scrollLeft - walk;
+
+                // Seamless real-time loop check during drag
+                const oneThird = ele.scrollWidth / 3;
+                if (ele.scrollLeft <= 50) {
+                  ele.scrollLeft = oneThird + ele.scrollLeft;
+                } else if (ele.scrollLeft >= (oneThird * 2) - 50) {
+                  ele.scrollLeft = ele.scrollLeft - oneThird;
+                }
+              };
+
+              const onMouseUp = () => {
+                ele.style.cursor = 'grab';
+                ele.style.removeProperty('user-select');
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+              };
+
+              document.addEventListener('mousemove', onMouseMove);
+              document.addEventListener('mouseup', onMouseUp);
+            }}
           >
-            {projectsData.map((project, index) => (
-              <div
+            {/* Triple the data for truly infinite bidirectional looping in both directions */}
+            {[...projectsData, ...projectsData, ...projectsData].map((project, index) => (
+              <motion.div
                 key={index}
                 onClick={() => setSelectedProject(project)}
-                className="mx-8 md:mx-12 w-[280px] sm:w-[350px] md:w-[480px] h-[380px] sm:h-[450px] md:h-[520px] flex-shrink-0 cursor-pointer relative"
+                whileHover={{ y: -10 }}
+                className="w-[280px] sm:w-[350px] md:w-[480px] h-[380px] sm:h-[450px] md:h-[520px] flex-shrink-0 cursor-pointer relative"
                 style={{ overflow: 'visible' }}
               >
                 <ProjectCard project={project} />
-              </div>
+              </motion.div>
             ))}
-          </Marquee>
+          </div>
+        </div>
+
+        {/* Navigation Controls - Responsive Sizes */}
+        <div className="w-full flex justify-center items-center gap-4 md:gap-6 mt-4 md:mt-8 mb-12">
+          <button
+            onClick={() => handleScroll('prev')}
+            className="p-3 md:p-4 rounded-full bg-[#1a1443] border border-[#25213b] text-[#16f2b3] hover:scale-110 active:scale-90 transition-all shadow-[0_0_20px_rgba(22,242,179,0.2)] group"
+          >
+            <HiArrowNarrowLeft size={24} className="md:size-7 group-hover:-translate-x-1 transition-transform" />
+          </button>
+          <button
+            onClick={() => handleScroll('next')}
+            className="p-3 md:p-4 rounded-full bg-[#1a1443] border border-[#25213b] text-[#16f2b3] hover:scale-110 active:scale-90 transition-all shadow-[0_0_20px_rgba(22,242,179,0.2)] group"
+          >
+            <HiArrowNarrowRight size={24} className="md:size-7 group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
       </section>
 

@@ -2,6 +2,8 @@
 
 import BlogCard from "../components/homepage/blog/blog-card";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { BiArrowBack } from "react-icons/bi";
 
 const staticBlogs = [
   {
@@ -91,7 +93,25 @@ const staticBlogs = [
 
 function Page() {
   return (
-    <div className="py-12 lg:py-24 container mx-auto px-6 lg:px-12">
+    <div className="py-12 lg:py-24 container mx-auto px-6 lg:px-12 relative min-h-screen">
+
+      {/* UNIQUE GO-BACK BUTTON */}
+      <div className="flex justify-start mb-12">
+        <Link
+          href="/"
+          className="group relative flex items-center gap-4 px-10 py-5 bg-[#1a1443]/40 backdrop-blur-2xl border border-white/10 rounded-2xl text-white font-bold tracking-[0.4em] overflow-hidden transition-all duration-700 hover:border-[#16f2b3]/60 shadow-[0_0_50px_rgba(0,0,0,0.5)] active:scale-95"
+        >
+          {/* Moving Laser Beam Effect */}
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-[#16f2b3]/20 to-transparent -translate-x-[200%] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out" />
+
+          <BiArrowBack size={24} className="text-[#16f2b3] group-hover:-translate-x-2 transition-transform duration-300" />
+          <span className="text-[11px] uppercase relative z-10">Back to Grid</span>
+
+          {/* Neon Corner Accent */}
+          <div className="absolute top-0 right-0 w-12 h-12 bg-gradient-to-br from-[#16f2b3]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Link>
+      </div>
+
       <div className="flex flex-col items-center mb-16 gap-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
@@ -125,7 +145,7 @@ function Page() {
             }
           }
         }}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-20"
       >
         {staticBlogs.map((blog, i) => (
           <motion.div

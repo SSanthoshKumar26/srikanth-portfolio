@@ -135,7 +135,7 @@ function ContactWithCaptcha() {
                 onClick={handleSendMail}
                 className="w-full group flex items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-[#16f2b3] to-violet-600 px-8 py-5 text-center text-xs font-black uppercase tracking-[0.4em] text-[#0d1224] shadow-xl transition-all duration-300"
               >
-                <span>Send Message</span>
+                <span>PING_ME()</span>
                 <TbMailForward className="group-hover:translate-x-2 transition-transform" size={20} />
               </motion.button>
             </div>

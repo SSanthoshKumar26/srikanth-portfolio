@@ -12,7 +12,6 @@ export default function ClientLayout({ children }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Reduced loading time for snappier performance
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 800);
@@ -30,8 +29,9 @@ export default function ClientLayout({ children }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, ease: "linear" }}
+                        className="overflow-x-hidden"
                     >
-                        <main className="min-h-screen relative mx-auto px-6 sm:px-12 lg:max-w-[70rem] xl:max-w-[76rem] 2xl:max-w-[92rem] text-white">
+                        <main className="min-h-screen relative w-full text-white overflow-x-hidden">
                             <Navbar />
                             {children}
                             <ScrollToTop />

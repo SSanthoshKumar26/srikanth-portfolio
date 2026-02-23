@@ -19,7 +19,7 @@ function ContactSection() {
       <div className="absolute top-1/4 -left-1/4 w-[500px] h-[500px] bg-[#16f2b3]/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-violet-600/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
+      <div className="container mx-auto px-6 sm:px-12 lg:max-w-[70rem] xl:max-w-[76rem] 2xl:max-w-[92rem] grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
         {/* Left Strategy Column - 5/12 width */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

@@ -163,7 +163,7 @@ const ContactWithoutCaptcha = () => {
               onClick={handleSendMail}
               className="w-full group flex items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-[#16f2b3] via-violet-600 to-[#16f2b3] bg-[length:200%_auto] hover:bg-right px-8 py-5 text-center text-[12px] font-black uppercase tracking-[0.4em] text-[#0d1224] shadow-[0_20px_50px_-15px_rgba(22,242,179,0.5)] transition-all duration-700 hover:shadow-cyan-500/20"
             >
-              <span>Transmit Message</span>
+              <span>PING_ME()</span>
               <TbMailForward size={20} className="group-hover:translate-x-3 group-hover:-translate-y-1 transition-transform duration-700 ease-out" />
             </motion.button>
           </div>

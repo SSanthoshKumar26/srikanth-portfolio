@@ -28,16 +28,16 @@ function HeroSection() {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-between py-4 lg:py-12 min-h-[90vh]">
+    <section className="relative flex flex-col items-center justify-between py-4 lg:py-12 min-h-[90vh] overflow-hidden">
       <Image
         src="/hero.svg"
         alt="Hero"
         width={1572}
         height={795}
-        className="absolute -top-[98px] -z-10 opacity-30"
+        className="absolute -top-[98px] -z-10 opacity-30 pointer-events-none"
       />
 
-      <div className="grid grid-cols-1 items-center lg:grid-cols-2 lg:gap-12 gap-y-8">
+      <div className="container mx-auto px-6 sm:px-12 lg:max-w-[70rem] xl:max-w-[76rem] 2xl:max-w-[92rem] grid grid-cols-1 items-center lg:grid-cols-2 lg:gap-12 gap-y-8">
         <motion.div
           variants={container}
           initial="hidden"
@@ -82,7 +82,7 @@ function HeroSection() {
           <motion.div variants={item} className="flex items-center gap-4 lg:gap-6">
             <Link href="#contact" className="group relative bg-gradient-to-r to-pink-500 from-violet-600 p-[1px] rounded-full transition-all duration-300">
               <div className="px-6 md:px-10 py-3.5 md:py-4 bg-[#0d1224] rounded-full border-none text-center text-xs md:text-sm font-bold uppercase tracking-[0.2em] text-white no-underline transition-all duration-200 flex items-center gap-2 group-hover:bg-transparent">
-                <span>Contact me</span>
+                <span>PING_ME()</span>
                 <RiContactsFill size={18} />
               </div>
             </Link>

@@ -19,7 +19,7 @@ function Footer() {
             whileInView={{ opacity: 1 }}
             className="text-sm font-medium tracking-wide text-gray-400"
           >
-            © {new Date().getFullYear()} Designed & Built with ❤️ by <Link target="_blank" href="https://www.linkedin.com/in/srikanth-sridhar-a43574242/" className="text-[#16f2b3] font-bold hover:underline underline-offset-4 transition-all">Srikanth Sridhar</Link>
+            © {new Date().getFullYear()} Designed & Built by <Link target="_blank" href="https://www.linkedin.com/in/srikanth-sridhar-a43574242/" className="text-[#16f2b3] font-bold hover:underline underline-offset-4 transition-all">Srikanth Sridhar</Link>
           </motion.p>
 
           <motion.div

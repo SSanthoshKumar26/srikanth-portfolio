@@ -12,10 +12,12 @@
 
 html,
 body {
+  overflow-x: hidden !important;
+  width: 100% !important;
+  position: relative;
   scroll-behavior: auto !important;
   color: rgb(var(--foreground-rgb));
   background-color: #0d1224;
-  overflow-x: hidden;
 }
 
 ::selection {
@@ -37,4 +39,45 @@ body {
 
 .animate-shine {
   animation: shine 1.5s infinite;
+}
+
+/* Add this to your global CSS file (e.g., globals.css) */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spinLightning {
+  from {
+    --angle: 0deg;
+  }
+
+  to {
+    --angle: 360deg;
+  }
+}
+
+.lightning-border {
+  background: conic-gradient(from var(--angle),
+      transparent 0deg,
+      #16f2b3 10deg,
+      transparent 20deg,
+      transparent 180deg,
+      #16f2b3 190deg,
+      transparent 200deg,
+      transparent 360deg);
+  animation: spinLightning 3s linear infinite paused;
+}
+
+/* Global hover control for any element with spinLightning animation */
+[style*="animation: spinLightning"],
+[style*="animation:spinLightning"] {
+  animation-play-state: paused;
+}
+
+.group\/card:hover [style*="animation: spinLightning"],
+.group\/card:hover [style*="animation:spinLightning"],
+.group\/card:hover .lightning-border {
+  animation-play-state: running !important;
 }

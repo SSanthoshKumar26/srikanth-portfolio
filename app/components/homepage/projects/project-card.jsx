@@ -1,111 +1,222 @@
-// @flow strict
 import * as React from 'react';
+import { FaTools, FaUser, FaRocket, FaGithub } from 'react-icons/fa';
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, isStatic = false }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [10, -10]), { stiffness: 300, damping: 30 });
+  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-10, 10]), { stiffness: 300, damping: 30 });
+
+  function handleMouseMove(event) {
+    if (isStatic) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseXRelative = event.clientX - rect.left;
+    const mouseYRelative = event.clientY - rect.top;
+
+    const xPct = mouseXRelative / width - 0.5;
+    const yPct = mouseYRelative / height - 0.5;
+
+    x.set(xPct);
+    y.set(yPct);
+    mouseX.set(mouseXRelative);
+    mouseY.set(mouseYRelative);
+  }
+
+  function handleMouseLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
   return (
-    <div className="from-[#0d1224] border-[#1b2c68a0] relative rounded-2xl border bg-gradient-to-r to-[#0a0d37] w-full h-full flex flex-col">
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX: isStatic ? 0 : rotateX,
+        rotateY: isStatic ? 0 : rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      whileHover={isStatic ? {} : { scale: 1.02 }}
+      className="relative w-full h-full rounded-2xl group/card transition-all duration-300 hover:shadow-[0_0_50px_-12px_rgba(22,242,179,0.3)]"
+    >
+      {/* MULTI COLOR LIGHTNING BORDER */}
+      <div className="borderGlow absolute -inset-[2px] rounded-2xl pointer-events-none" />
+      <div className="borderGlowInner absolute -inset-[1px] rounded-2xl pointer-events-none" />
 
-      {/* top gradient lines */}
-      <div className="flex flex-row flex-shrink-0">
-        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-pink-500 to-violet-600" />
-        <div className="h-[1px] w-full bg-gradient-to-r from-violet-600 to-transparent" />
-      </div>
+      {/* Interactive Spotlight Glow */}
+      {!isStatic && (
+        <motion.div
+          className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 z-10"
+          style={{
+            background: useTransform(
+              [mouseX, mouseY],
+              ([xm, ym]) => `radial-gradient(400px circle at ${xm}px ${ym}px, rgba(22, 242, 179, 0.25), rgba(124, 58, 237, 0.1), transparent 80%)`
+            ),
+          }}
+        />
+      )}
 
-      {/* title bar */}
-      <div className="px-4 lg:px-7 py-3 relative flex-shrink-0">
-        <div className="flex flex-row space-x-1.5 absolute top-1/2 -translate-y-1/2">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
-          <div className="h-2.5 w-2.5 rounded-full bg-orange-400" />
-          <div className="h-2.5 w-2.5 rounded-full bg-green-300" />
+      {/* CARD */}
+      <div
+        style={{ transform: isStatic ? "none" : "translateZ(50px)" }}
+        className="relative z-10 w-full h-full flex flex-col overflow-hidden bg-[#0d1224] rounded-2xl border border-white/10"
+      >
+        {/* HEADER */}
+        <div className="bg-[#1b223c] px-4 md:px-8 py-3 md:py-5 flex items-center justify-between border-b border-[#1e293b]">
+          <div className="flex items-center space-x-2">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
+            <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
+          </div>
+
+          <div className="flex flex-col items-center flex-1 mx-4">
+            <div className="flex items-center gap-2 text-[#16f2b3]">
+              <FaRocket className="text-xs md:text-sm" />
+              <h3 className="text-white text-[10px] md:text-sm lg:text-base font-bold uppercase tracking-widest leading-tight text-center">
+                {project.name}
+              </h3>
+            </div>
+          </div>
+
+          <div className="flex-shrink-0">
+            {(project.code || project.repoUrl) && (
+              <a
+                href={project.code || project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center justify-center w-7 h-7 md:w-9 md:h-9 rounded-full bg-white/5 text-white hover:bg-cyan-300 hover:text-black transition-all transform hover:scale-110 active:scale-95 border border-white/5"
+              >
+                <FaGithub className="text-sm md:text-lg" />
+              </a>
+            )}
+          </div>
         </div>
-        <p className="text-center text-[#16f2b3] text-sm lg:text-base font-bold tracking-wider truncate ml-10">
-          {project.name}
-        </p>
+
+        {/* CONTENT (Code Editor Style) - Scrollbar Hidden */}
+        <div className="flex-1 p-4 md:p-8 font-mono text-[10px] md:text-xs lg:text-sm overflow-y-auto no-scrollbar bg-[#0d1224] leading-relaxed">
+          <div className="flex flex-col gap-2 md:gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-pink-500">const</span>
+              <span className="text-white">project</span>
+              <span className="text-pink-500">=</span>
+              <span className="text-gray-400">{'{'}</span>
+            </div>
+
+            <div className="ml-4 md:ml-8">
+              <span className="text-white">name:</span>
+              <span className="text-gray-400"> '</span>
+              <span className="text-amber-300">{project.name}</span>
+              <span className="text-gray-400">',</span>
+            </div>
+
+            <div className="ml-4 md:ml-8 flex flex-wrap items-baseline">
+              <FaTools className="text-purple-500 mr-2 shrink-0 text-[10px]" />
+              <span className="text-white mr-2">tools:</span>
+              <span className="text-gray-400">[</span>
+              {(project.tools || []).map((tool, i) => (
+                <React.Fragment key={i}>
+                  <span className="text-gray-400">'</span>
+                  <span className="text-amber-300">{tool}</span>
+                  <span className="text-gray-400">'</span>
+                  {i < project.tools.length - 1 && <span className="text-gray-400">, </span>}
+                </React.Fragment>
+              ))}
+              <span className="text-gray-400">],</span>
+            </div>
+
+            <div className="ml-4 md:ml-8">
+              <span className="text-white">description:</span>
+              <span className="text-gray-400"> '</span>
+              <span className={`text-cyan-400 antialiased ${isStatic ? '' : 'line-clamp-3'}`}>
+                {project.description}
+              </span>
+              <span className="text-gray-400">',</span>
+            </div>
+
+            <div>
+              <span className="text-gray-400">{'};'}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* code block — scrollable so card never clips */}
-      <div className="overflow-y-auto overflow-x-hidden border-t-[2px] border-indigo-900 px-4 lg:px-7 py-5 flex-1
-        [&::-webkit-scrollbar]:w-[3px]
-        [&::-webkit-scrollbar-track]:bg-transparent
-        [&::-webkit-scrollbar-thumb]:bg-violet-700/40
-        [&::-webkit-scrollbar-thumb]:rounded-full">
-        <code className="font-mono text-[11px] md:text-xs lg:text-sm leading-relaxed">
-          <div>
-            <span className="text-pink-500">const </span>
-            <span className="text-white">project </span>
-            <span className="text-pink-500">= </span>
-            <span className="text-gray-400">{'{'}</span>
-          </div>
+      {/* ANIMATION */}
+      <style jsx>{`
+        @property --angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
 
-          <div className="pl-4 lg:pl-6">
-            <span className="text-white">name: </span>
-            <span className="text-gray-400">'</span>
-            <span className="text-amber-300">{project.name}</span>
-            <span className="text-gray-400">',</span>
-          </div>
+        .borderGlow,
+        .borderGlowInner {
+          opacity: ${isStatic ? '1' : '0.4'};
+          transition: opacity 0.4s ease, filter 0.4s ease;
+          animation: spin 6s linear infinite;
+          animation-play-state: running;
+        }
 
-          <div className="pl-4 lg:pl-6">
-            <span className="text-white">tools: </span>
-            <span className="text-gray-400">['</span>
-            {(project.tools || []).map((tag, i) => (
-              <React.Fragment key={i}>
-                <span className="text-amber-300">{tag}</span>
-                {i < project.tools.length - 1 && <span className="text-gray-400">',&nbsp;'</span>}
-              </React.Fragment>
-            ))}
-            <span className="text-gray-400">'],</span>
-          </div>
+        .group\\/card:hover .borderGlow,
+        .group\\/card:hover .borderGlowInner {
+          opacity: 1;
+          filter: brightness(1.8) blur(12px);
+        }
 
-          {project.role && (
-            <div className="pl-4 lg:pl-6">
-              <span className="text-white">myRole: </span>
-              <span className="text-orange-400">'{project.role}'</span>
-              <span className="text-gray-400">,</span>
-            </div>
-          )}
+        .borderGlow {
+          background: conic-gradient(
+            from var(--angle),
+            transparent 0%,
+            transparent 5%,
+            #16f2b3 10%,
+            #00e5ff 15%,
+            #7c3aed 20%,
+            #ff4ecd 25%,
+            #16f2b3 30%,
+            transparent 35%,
+            transparent 100%
+          );
+          filter: blur(14px) brightness(2);
+        }
 
-          <div className="pl-4 lg:pl-6">
-            <span className="text-white">description: </span>
-            <span className="text-cyan-400">'{project.description}'</span>
-            <span className="text-gray-400">,</span>
-          </div>
+        .borderGlowInner {
+          background: conic-gradient(
+            from var(--angle),
+            transparent 0%,
+            transparent 8%,
+            #16f2b3 12%,
+            #00e5ff 15%,
+            #7c3aed 18%,
+            #ff4ecd 22%,
+            #16f2b3 25%,
+            white 27%,
+            transparent 32%,
+            transparent 100%
+          );
+        }
 
-          {project.demo && (
-            <div className="pl-4 lg:pl-6">
-              <span className="text-white">demo: </span>
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="text-[#16f2b3] hover:underline break-all"
-              >
-                '{project.demo}'
-              </a>
-              <span className="text-gray-400">,</span>
-            </div>
-          )}
+        @keyframes spin {
+          from { --angle: 0deg; }
+          to { --angle: 360deg; }
+        }
 
-          {project.code && (
-            <div className="pl-4 lg:pl-6">
-              <span className="text-white">github: </span>
-              <a
-                href={project.code}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-                className="text-violet-400 hover:underline break-all"
-              >
-                '{project.code}'
-              </a>
-              <span className="text-gray-400">,</span>
-            </div>
-          )}
-
-          <div><span className="text-gray-400">{'};'}</span></div>
-        </code>
-      </div>
-    </div>
+        .no-scrollbar::-webkit-scrollbar {
+          display: none !important;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+          overflow: hidden !important;
+          display: block !important;
+        }
+      `}</style>
+    </motion.div>
   );
 }
 
